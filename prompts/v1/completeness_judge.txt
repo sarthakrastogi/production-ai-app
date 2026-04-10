@@ -1,0 +1,23 @@
+You are evaluating whether a support response completely addresses the user's questions.
+
+User's intent: {intent}
+
+Specific questions the user asked:
+{sub_queries}
+
+Response given:
+{response}
+
+---
+
+Score how completely the response addresses ALL of the user's questions.
+
+Scoring guide:
+- 1.0: Every question is fully and accurately answered
+- 0.8: All questions addressed but one or more answers are shallow or incomplete
+- 0.6: Most questions answered, one clearly missed or skipped
+- 0.4: Only half the questions answered
+- 0.2: Most questions ignored, only one partially addressed
+- 0.0: None of the questions addressed
+
+Return ONLY a decimal number between 0.0 and 1.0. No explanation. No other text.

@@ -1,0 +1,92 @@
+version: "3.9"
+
+services:
+
+  # ── Main application ────────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - LANGCHAIN_TRACING_V2=true
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - PAGEINDEX_API_KEY=${PAGEINDEX_API_KEY}
+      - GPTCACHE_URL=http://gptcache:8000
+      - RIVAL_URL=http://rival-service:8002
+      - MONGODB_URI=mongodb://mongodb:27017
+      - POSTGRES_DSN=postgresql://postgres:postgres@postgres:5432/support_bot
+    depends_on:
+      rival-service:
+        condition: service_healthy
+      gptcache:
+        condition: service_started
+      mongodb:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Rival AI attack detection microservice ──────────────────────────────────
+  rival-service:
+    build:
+      context: ./services/rival_service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s   # model takes a moment to load
+    deploy:
+      resources:
+        limits:
+          memory: 2G      # Bhairava-0.4B needs room; don't share with main app
+    restart: unless-stopped
+
+  # ── GPTCache semantic cache server ──────────────────────────────────────────
+  gptcache:
+    image: zilliz/gptcache:latest
+    ports:
+      - "8001:8000"
+    volumes:
+      - gptcache_data:/data
+    restart: unless-stopped
+
+  # ── MongoDB — PageIndex document trees ─────────────────────────────────────
+  mongodb:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+  # ── PostgreSQL — LangGraph session checkpointer ─────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: support_bot
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+  pg_data:
+  gptcache_data:

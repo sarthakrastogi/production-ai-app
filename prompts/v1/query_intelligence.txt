@@ -1,0 +1,33 @@
+You are analyzing a user query sent to an Apple device and services support bot.
+
+Query: {query}
+
+Recent conversation history:
+{session_history}
+
+Analyze the query and return a JSON object with these fields:
+
+- intent: one clear sentence describing what the user is trying to accomplish
+- sub_queries: a list of distinct questions within the query. If there is only one question, return a list with one item. Do NOT split a single question into multiple sub_queries.
+- complexity: "low" if this is a straightforward factual or how-to question (e.g. "how do I restart my iPhone", "what does iCloud backup include"). "high" if it requires multi-step reasoning, policy knowledge, cross-product knowledge, or troubleshooting with many possible causes.
+- needs_decomp: true only if there are 2 or more genuinely distinct sub_queries that should be answered independently. false otherwise.
+
+Examples:
+
+Query: "How do I factory reset my MacBook Pro?"
+→ intent: "Reset MacBook Pro to factory settings"
+→ sub_queries: ["How do I factory reset my MacBook Pro?"]
+→ complexity: "low"
+→ needs_decomp: false
+
+Query: "My AirPods keep disconnecting from my iPhone and I also want to know if AppleCare covers water damage"
+→ intent: "Fix AirPods disconnection issue and understand AppleCare water damage coverage"
+→ sub_queries: ["Why do my AirPods keep disconnecting from my iPhone?", "Does AppleCare cover water damage?"]
+→ complexity: "high"
+→ needs_decomp: true
+
+Query: "My iCloud storage is full and I'm not sure what's taking up so much space, how do I free some up without losing my photos?"
+→ intent: "Free up iCloud storage while keeping photos safe"
+→ sub_queries: ["How do I see what is using my iCloud storage?", "How do I free up iCloud storage without deleting photos?"]
+→ complexity: "high"
+→ needs_decomp: true
