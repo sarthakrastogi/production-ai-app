@@ -4,7 +4,7 @@ from app.resilience.retry import llm_retry
 
 _PROMPT = Path("prompts/v1/completeness_judge.txt").read_text()
 
-_judge = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0)
+_judge = ChatGoogleGenerativeAI(model="gemini-3.5-flash", temperature=0)
 
 
 @llm_retry

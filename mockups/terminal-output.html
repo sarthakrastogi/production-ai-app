@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Terminal - Eval Suite Output</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #1a1b26; padding: 40px; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
+
+.terminal { max-width: 820px; margin: 0 auto; background: #1a1b26; border-radius: 10px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); border: 1px solid #30363d; }
+
+.terminal-header { background: #2d2d3d; padding: 10px 16px; display: flex; align-items: center; gap: 8px; }
+.terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+.dot-red { background: #ff5f57; }
+.dot-yellow { background: #febc2e; }
+.dot-green { background: #28c840; }
+.terminal-title { flex: 1; text-align: center; font-size: 13px; color: #8b949e; font-family: monospace; }
+
+.terminal-body { padding: 20px; font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, monospace; font-size: 13px; line-height: 1.7; color: #a9b1d6; overflow-x: auto; white-space: pre-wrap; }
+
+.prompt { color: #7aa2f7; }
+.command { color: #e6edf3; }
+.dim { color: #565f89; }
+.green { color: #9ece6a; }
+.red { color: #f7768e; }
+.yellow { color: #e0af68; }
+.blue { color: #7aa2f7; }
+.purple { color: #bb9af7; }
+.cyan { color: #7dcfff; }
+.white { color: #c0caf5; }
+.bold { font-weight: 700; }
+.separator { color: #565f89; }
+</style>
+</head>
+<body>
+<div class="terminal">
+  <div class="terminal-header">
+    <div class="terminal-dot dot-red"></div>
+    <div class="terminal-dot dot-yellow"></div>
+    <div class="terminal-dot dot-green"></div>
+    <div class="terminal-title">sarthak@dev ~/production-ai-app</div>
+  </div>
+  <div class="terminal-body">
+<span class="prompt">$</span> <span class="command">make evals-offline</span>
+
+<span class="purple bold">Running offline evals...</span>
+<span class="separator">============================================================</span>
+
+<span class="cyan">ROUTING LOGIC</span>
+  <span class="green">[PASS]</span> battery-drain-basic → low complexity → flash <span class="dim">(correct)</span>
+  <span class="green">[PASS]</span> wifi-simple → low complexity → flash <span class="dim">(correct)</span>
+  <span class="green">[PASS]</span> icloud-cancel-photos → high complexity → pro <span class="dim">(correct)</span>
+  <span class="green">[PASS]</span> trade-in-complex → high complexity → pro <span class="dim">(correct)</span>
+  <span class="green">[PASS]</span> multi-device-setup → high complexity → pro + decomp <span class="dim">(correct)</span>
+  <span class="green">[PASS]</span> facetime-handoff → low complexity → flash <span class="dim">(correct)</span>
+  <span class="green">[PASS]</span> warranty-multi-part → high complexity → pro + decomp <span class="dim">(correct)</span>
+  <span class="green">[PASS]</span> airpods-firmware → low complexity → flash <span class="dim">(correct)</span>
+
+<span class="cyan">DECOMPOSITION</span>
+  <span class="green">[PASS]</span> multi-device-setup: needs_decomp=true, sub_queries=3 <span class="dim">(expected: 3)</span>
+  <span class="green">[PASS]</span> warranty-multi-part: needs_decomp=true, sub_queries=2 <span class="dim">(expected: 2)</span>
+  <span class="green">[PASS]</span> icloud-cancel-photos: needs_decomp=true, sub_queries=2 <span class="dim">(expected: 2)</span>
+  <span class="green">[PASS]</span> battery-drain-basic: needs_decomp=false <span class="dim">(correct)</span>
+
+<span class="cyan">PROMPT FILES</span>
+  <span class="green">[PASS]</span> prompts/v1/generation.txt exists and non-empty <span class="dim">(2,340 chars)</span>
+  <span class="green">[PASS]</span> prompts/v1/query_intelligence.txt exists and non-empty <span class="dim">(1,820 chars)</span>
+  <span class="green">[PASS]</span> prompts/v1/faithfulness_judge.txt exists and non-empty <span class="dim">(890 chars)</span>
+  <span class="green">[PASS]</span> prompts/v1/completeness_judge.txt exists and non-empty <span class="dim">(720 chars)</span>
+
+<span class="cyan">TOKEN BUDGETS</span>
+  <span class="green">[PASS]</span> battery-drain-basic: est. 1,200 tokens ≤ max 2,000
+  <span class="green">[PASS]</span> icloud-cancel-photos: est. 2,800 tokens ≤ max 4,000
+  <span class="green">[PASS]</span> multi-device-setup: est. 3,400 tokens ≤ max 4,500
+  <span class="green">[PASS]</span> All 8 cases within token budgets
+
+<span class="cyan">MODEL ASSIGNMENT</span>
+  <span class="green">[PASS]</span> Flash cases (4): all map to gemini-3.5-flash
+  <span class="green">[PASS]</span> Pro cases (4): all map to gemini-3.1-pro
+  <span class="green">[PASS]</span> No model mismatch detected
+
+<span class="separator">============================================================</span>
+<span class="green bold">PASSED: 35/35 checks passed</span> <span class="dim">(1.8s)</span>
+
+<span class="prompt">$</span> <span class="command">make evals</span>
+
+<span class="purple bold">Running live eval suite...</span>
+<span class="dim">Target: http://localhost:8000</span>
+<span class="separator">============================================================</span>
+
+  <span class="green">[PASS]</span> battery-drain-basic <span class="dim">(1,240ms)</span> <span class="blue">flash</span> faith=0.92 comp=0.85
+  <span class="green">[PASS]</span> wifi-simple <span class="dim">(980ms)</span> <span class="blue">flash</span> faith=0.88 comp=0.81
+  <span class="green">[PASS]</span> icloud-cancel-photos <span class="dim">(6,420ms)</span> <span class="purple">pro</span> faith=0.84 comp=0.77
+  <span class="green">[PASS]</span> trade-in-complex <span class="dim">(7,210ms)</span> <span class="purple">pro</span> faith=0.81 comp=0.72
+  <span class="green">[PASS]</span> multi-device-setup <span class="dim">(8,940ms)</span> <span class="purple">pro+decomp</span> faith=0.85 comp=0.74
+  <span class="green">[PASS]</span> facetime-handoff <span class="dim">(1,100ms)</span> <span class="blue">flash</span> faith=0.91 comp=0.83
+  <span class="green">[PASS]</span> warranty-multi-part <span class="dim">(8,120ms)</span> <span class="purple">pro+decomp</span> faith=0.86 comp=0.79
+  <span class="green">[PASS]</span> airpods-firmware <span class="dim">(1,350ms)</span> <span class="blue">flash</span> faith=0.89 comp=0.82
+
+<span class="separator">============================================================</span>
+
+<span class="white bold">Results: 8/8 passed</span>
+<span class="white">Avg latency: 4,420ms</span>
+<span class="white">P95 latency: 8,940ms</span>
+<span class="white">Estimated cost: $0.0031</span>
+
+<span class="cyan">Baseline comparison:</span>
+  Latency: <span class="green">-9.7%</span> <span class="dim">(threshold: 20%)</span>
+  Cost: <span class="green">-8.8%</span> <span class="dim">(threshold: 30%)</span>
+  Pass rate: <span class="green">stable</span>
+
+<span class="green bold">PASSED</span> <span class="dim">— no regressions detected</span>
+
+Report written to evals/reports/latest.json
+<span class="prompt">$</span> <span class="dim">█</span>
+</div>
+</div>
+</body>
+</html>

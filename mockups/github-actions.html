@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>GitHub Actions - Workflow Runs</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #0d1117; color: #e6edf3; padding: 40px; }
+
+.container { max-width: 1000px; margin: 0 auto; }
+
+.page-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #30363d; }
+.page-header h1 { font-size: 20px; font-weight: 600; }
+
+.tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 1px solid #30363d; }
+.tab { padding: 8px 16px; font-size: 14px; color: #8b949e; cursor: pointer; border-bottom: 2px solid transparent; }
+.tab.active { color: #e6edf3; border-bottom: 2px solid #f78166; }
+
+.workflow-list { }
+
+.workflow-run { display: flex; align-items: center; padding: 16px; border: 1px solid #30363d; border-radius: 6px; margin-bottom: 8px; background: #161b22; gap: 12px; }
+.workflow-run:hover { background: #1c2128; }
+
+.run-icon { font-size: 20px; flex-shrink: 0; }
+.run-icon.success { color: #3fb950; }
+.run-icon.failure { color: #f85149; }
+.run-icon.running { color: #d29922; }
+
+.run-info { flex: 1; }
+.run-title { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+.run-title a { color: #e6edf3; text-decoration: none; }
+.run-meta { font-size: 12px; color: #8b949e; }
+.run-meta .branch { background: #1f3a5f; color: #79c0ff; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 11px; }
+.run-meta .event { color: #8b949e; }
+
+.run-timing { text-align: right; font-size: 12px; color: #8b949e; }
+.run-duration { margin-bottom: 2px; }
+
+.workflow-badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 12px; margin-left: 8px; }
+.badge-ci { background: #1f3a5f; color: #79c0ff; }
+.badge-eval { background: #2d1f3f; color: #d2a8ff; }
+.badge-deploy { background: #1a3d2e; color: #7ee787; }
+.badge-nightly { background: #3d2f1a; color: #d29922; }
+
+.section-header { font-size: 14px; font-weight: 600; color: #8b949e; margin: 16px 0 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="page-header">
+  <h1>Actions</h1>
+  <span style="color: #8b949e; font-size: 14px;">sarthakrastogi/production-ai-app</span>
+</div>
+
+<div class="tabs">
+  <div class="tab active">All workflows</div>
+  <div class="tab">CI</div>
+  <div class="tab">Eval Gate</div>
+  <div class="tab">Deploy</div>
+  <div class="tab">Nightly Evals</div>
+</div>
+
+<div class="workflow-list">
+
+  <div class="workflow-run">
+    <div class="run-icon running">&#x25CF;</div>
+    <div class="run-info">
+      <div class="run-title"><a href="#">Eval Gate</a><span class="workflow-badge badge-eval">eval-gate</span></div>
+      <div class="run-meta">
+        <span class="event">pull_request</span> &middot;
+        <span class="branch">feature/concise-prompt</span> &middot;
+        #142 opened by sarthakrastogi
+      </div>
+    </div>
+    <div class="run-timing">
+      <div class="run-duration">Running for 3m 24s</div>
+      <div>2 minutes ago</div>
+    </div>
+  </div>
+
+  <div class="workflow-run">
+    <div class="run-icon success">&#x2713;</div>
+    <div class="run-info">
+      <div class="run-title"><a href="#">CI</a><span class="workflow-badge badge-ci">ci</span></div>
+      <div class="run-meta">
+        <span class="event">pull_request</span> &middot;
+        <span class="branch">feature/concise-prompt</span> &middot;
+        #142 lint, type-check, offline evals, docker build
+      </div>
+    </div>
+    <div class="run-timing">
+      <div class="run-duration">32s</div>
+      <div>5 minutes ago</div>
+    </div>
+  </div>
+
+  <div class="workflow-run">
+    <div class="run-icon success">&#x2713;</div>
+    <div class="run-info">
+      <div class="run-title"><a href="#">Deploy</a><span class="workflow-badge badge-deploy">deploy</span></div>
+      <div class="run-meta">
+        <span class="event">push to main</span> &middot;
+        <span class="branch">main</span> &middot;
+        #141 Merge PR #46: update session memory prompt
+      </div>
+    </div>
+    <div class="run-timing">
+      <div class="run-duration">4m 12s</div>
+      <div>1 hour ago</div>
+    </div>
+  </div>
+
+  <div class="workflow-run">
+    <div class="run-icon success">&#x2713;</div>
+    <div class="run-info">
+      <div class="run-title"><a href="#">Nightly Evals</a><span class="workflow-badge badge-nightly">nightly</span></div>
+      <div class="run-meta">
+        <span class="event">schedule</span> &middot;
+        <span class="branch">main</span> &middot;
+        Daily 6:00 UTC &mdash; all 8 cases passed
+      </div>
+    </div>
+    <div class="run-timing">
+      <div class="run-duration">6m 48s</div>
+      <div>6 hours ago</div>
+    </div>
+  </div>
+
+  <div class="workflow-run">
+    <div class="run-icon failure">&#x2717;</div>
+    <div class="run-info">
+      <div class="run-title"><a href="#">Eval Gate</a><span class="workflow-badge badge-eval">eval-gate</span></div>
+      <div class="run-meta">
+        <span class="event">pull_request</span> &middot;
+        <span class="branch">experiment/short-prompt</span> &middot;
+        #140 &mdash; 3 regressions detected, PR blocked
+      </div>
+    </div>
+    <div class="run-timing">
+      <div class="run-duration">5m 31s</div>
+      <div>yesterday</div>
+    </div>
+  </div>
+
+  <div class="workflow-run">
+    <div class="run-icon success">&#x2713;</div>
+    <div class="run-info">
+      <div class="run-title"><a href="#">CI</a><span class="workflow-badge badge-ci">ci</span></div>
+      <div class="run-meta">
+        <span class="event">pull_request</span> &middot;
+        <span class="branch">experiment/short-prompt</span> &middot;
+        #140 lint, type-check, offline evals, docker build
+      </div>
+    </div>
+    <div class="run-timing">
+      <div class="run-duration">28s</div>
+      <div>yesterday</div>
+    </div>
+  </div>
+
+  <div class="workflow-run">
+    <div class="run-icon failure">&#x2717;</div>
+    <div class="run-info">
+      <div class="run-title"><a href="#">Nightly Evals</a><span class="workflow-badge badge-nightly">nightly</span></div>
+      <div class="run-meta">
+        <span class="event">schedule</span> &middot;
+        <span class="branch">main</span> &middot;
+        Daily 6:00 UTC &mdash; REGRESSION: faithfulness dropped (possible model update)
+      </div>
+    </div>
+    <div class="run-timing">
+      <div class="run-duration">7m 02s</div>
+      <div>3 days ago</div>
+    </div>
+  </div>
+
+  <div class="workflow-run">
+    <div class="run-icon success">&#x2713;</div>
+    <div class="run-info">
+      <div class="run-title"><a href="#">Deploy</a><span class="workflow-badge badge-deploy">deploy</span></div>
+      <div class="run-meta">
+        <span class="event">push to main</span> &middot;
+        <span class="branch">main</span> &middot;
+        #139 Merge PR #44: add circuit breaker to PageIndex
+      </div>
+    </div>
+    <div class="run-timing">
+      <div class="run-duration">4m 44s</div>
+      <div>4 days ago</div>
+    </div>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

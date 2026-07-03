@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PR Eval Comment Mockup</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; background: #0d1117; color: #e6edf3; padding: 40px; }
+
+.pr-page { max-width: 900px; margin: 0 auto; }
+
+.pr-header { border-bottom: 1px solid #30363d; padding-bottom: 16px; margin-bottom: 24px; }
+.pr-title { font-size: 26px; font-weight: 400; margin-bottom: 8px; }
+.pr-title .number { color: #8b949e; }
+.pr-meta { font-size: 14px; color: #8b949e; }
+.pr-meta .branch { background: #1f3a5f; color: #79c0ff; padding: 2px 8px; border-radius: 6px; font-family: monospace; font-size: 12px; }
+
+.labels { margin-top: 8px; }
+.label { display: inline-block; font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 12px; margin-right: 4px; }
+.label-green { background: #1a4d2e; color: #3fb950; border: 1px solid #238636; }
+.label-red { background: #4d1a1a; color: #f85149; border: 1px solid #da3633; }
+
+.comment { background: #161b22; border: 1px solid #30363d; border-radius: 6px; margin-top: 24px; }
+.comment-header { background: #1c2128; padding: 12px 16px; border-bottom: 1px solid #30363d; border-radius: 6px 6px 0 0; display: flex; align-items: center; gap: 8px; }
+.comment-header img { width: 32px; height: 32px; border-radius: 50%; }
+.comment-header .name { font-weight: 600; font-size: 14px; }
+.comment-header .bot-badge { background: #30363d; color: #8b949e; font-size: 11px; padding: 1px 6px; border-radius: 12px; border: 1px solid #484f58; }
+.comment-header .time { color: #8b949e; font-size: 14px; margin-left: auto; }
+
+.comment-body { padding: 16px 24px; font-size: 14px; line-height: 1.6; }
+.comment-body h2 { font-size: 20px; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid #30363d; }
+.comment-body h3 { font-size: 16px; margin-top: 16px; margin-bottom: 8px; }
+
+table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+th, td { padding: 8px 12px; text-align: left; border: 1px solid #30363d; }
+th { background: #1c2128; font-weight: 600; }
+td { font-family: monospace; font-size: 13px; }
+
+.pass { color: #3fb950; }
+.fail { color: #f85149; }
+.warn { color: #d29922; }
+
+.status-icon { margin-right: 4px; }
+
+.regression-box { background: #2d1b1b; border: 1px solid #da3633; border-radius: 6px; padding: 12px 16px; margin-top: 16px; }
+.regression-box h3 { color: #f85149; margin-top: 0; border: none; }
+.regression-box ul { list-style: none; padding-left: 0; }
+.regression-box li { padding: 4px 0; }
+.regression-box li::before { content: ""; }
+
+.no-regression-box { background: #1a2e1a; border: 1px solid #238636; border-radius: 6px; padding: 12px 16px; margin-top: 16px; }
+.no-regression-box h3 { color: #3fb950; margin-top: 0; border: none; }
+
+.details-table td.case-id { font-weight: 600; }
+
+.footer-note { margin-top: 16px; font-size: 12px; color: #8b949e; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="pr-page">
+
+<div class="pr-header">
+  <div class="pr-title">refactor: make generation prompt more concise <span class="number">#47</span></div>
+  <div class="pr-meta">
+    <span class="branch">feature/concise-prompt</span> &larr; <span class="branch">main</span>
+    &nbsp;&middot;&nbsp; opened 2 minutes ago by <strong>sarthakrastogi</strong>
+  </div>
+  <div class="labels">
+    <span class="label label-green">evals-passed</span>
+  </div>
+</div>
+
+<div class="comment">
+  <div class="comment-header">
+    <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="bot">
+    <span class="name">github-actions</span>
+    <span class="bot-badge">bot</span>
+    <span class="time">2 minutes ago</span>
+  </div>
+  <div class="comment-body">
+    <h2>&#x1f9ea; Eval Results</h2>
+
+    <table>
+      <tr><th>Metric</th><th>Value</th><th>Baseline</th><th>Change</th><th>Status</th></tr>
+      <tr>
+        <td>Pass Rate</td>
+        <td>100% (8/8)</td>
+        <td>100%</td>
+        <td>-</td>
+        <td class="pass"><span class="status-icon">&#x2705;</span> Pass</td>
+      </tr>
+      <tr>
+        <td>Avg Latency</td>
+        <td>3,820ms</td>
+        <td>4,230ms</td>
+        <td class="pass">-9.7%</td>
+        <td class="pass"><span class="status-icon">&#x2705;</span> Pass</td>
+      </tr>
+      <tr>
+        <td>P95 Latency</td>
+        <td>8,940ms</td>
+        <td>12,400ms</td>
+        <td class="pass">-27.9%</td>
+        <td class="pass"><span class="status-icon">&#x2705;</span> Pass</td>
+      </tr>
+      <tr>
+        <td>Est. Cost</td>
+        <td>$0.0028</td>
+        <td>$0.0034</td>
+        <td class="pass">-17.6%</td>
+        <td class="pass"><span class="status-icon">&#x2705;</span> Pass</td>
+      </tr>
+      <tr>
+        <td>Avg Faithfulness</td>
+        <td>0.87</td>
+        <td>0.84</td>
+        <td class="pass">+3.6%</td>
+        <td class="pass"><span class="status-icon">&#x2705;</span> Pass</td>
+      </tr>
+      <tr>
+        <td>Avg Completeness</td>
+        <td>0.79</td>
+        <td>0.76</td>
+        <td class="pass">+3.9%</td>
+        <td class="pass"><span class="status-icon">&#x2705;</span> Pass</td>
+      </tr>
+    </table>
+
+    <div class="no-regression-box">
+      <h3>&#x2705; No regressions detected</h3>
+      All metrics within thresholds. Latency: &lt;20% | Cost: &lt;30% | Pass rate: stable.
+    </div>
+
+    <h3>Per-case breakdown</h3>
+    <table>
+      <tr><th>Case</th><th>Model</th><th>Latency</th><th>Faith.</th><th>Comp.</th><th>Status</th></tr>
+      <tr>
+        <td class="case-id">battery-drain-basic</td>
+        <td>gemini-3.5-flash</td>
+        <td>1,240ms</td>
+        <td>0.92</td>
+        <td>0.85</td>
+        <td class="pass">&#x2705;</td>
+      </tr>
+      <tr>
+        <td class="case-id">wifi-simple</td>
+        <td>gemini-3.5-flash</td>
+        <td>980ms</td>
+        <td>0.88</td>
+        <td>0.81</td>
+        <td class="pass">&#x2705;</td>
+      </tr>
+      <tr>
+        <td class="case-id">icloud-cancel-photos</td>
+        <td>gemini-3.1-pro</td>
+        <td>6,420ms</td>
+        <td>0.84</td>
+        <td>0.77</td>
+        <td class="pass">&#x2705;</td>
+      </tr>
+      <tr>
+        <td class="case-id">trade-in-complex</td>
+        <td>gemini-3.1-pro</td>
+        <td>7,210ms</td>
+        <td>0.81</td>
+        <td>0.72</td>
+        <td class="pass">&#x2705;</td>
+      </tr>
+      <tr>
+        <td class="case-id">multi-device-setup</td>
+        <td>gemini-3.1-pro</td>
+        <td>8,940ms</td>
+        <td>0.85</td>
+        <td>0.74</td>
+        <td class="pass">&#x2705;</td>
+      </tr>
+      <tr>
+        <td class="case-id">facetime-handoff</td>
+        <td>gemini-3.5-flash</td>
+        <td>1,100ms</td>
+        <td>0.91</td>
+        <td>0.83</td>
+        <td class="pass">&#x2705;</td>
+      </tr>
+      <tr>
+        <td class="case-id">warranty-multi-part</td>
+        <td>gemini-3.1-pro</td>
+        <td>8,120ms</td>
+        <td>0.86</td>
+        <td>0.79</td>
+        <td class="pass">&#x2705;</td>
+      </tr>
+      <tr>
+        <td class="case-id">airpods-firmware</td>
+        <td>gemini-3.5-flash</td>
+        <td>1,350ms</td>
+        <td>0.89</td>
+        <td>0.82</td>
+        <td class="pass">&#x2705;</td>
+      </tr>
+    </table>
+
+    <p class="footer-note">Run by eval-gate.yml &middot; Commit a3f8c2d &middot; Baseline: evals/baselines/latest.json</p>
+  </div>
+</div>
+
+</div>
+</body>
+</html>

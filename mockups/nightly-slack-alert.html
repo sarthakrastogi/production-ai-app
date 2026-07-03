@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Slack - Nightly Eval Alert</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif; background: #1a1d21; color: #d1d2d3; padding: 40px; }
+
+.slack-container { max-width: 700px; margin: 0 auto; }
+
+.channel-header { padding: 12px 20px; border-bottom: 1px solid #35373b; margin-bottom: 16px; }
+.channel-name { font-size: 16px; font-weight: 700; color: #e8e8e8; }
+.channel-name::before { content: "# "; color: #8b8d90; }
+
+.message { display: flex; gap: 12px; padding: 8px 20px; margin-bottom: 4px; }
+.message:hover { background: #222529; }
+
+.avatar { width: 36px; height: 36px; border-radius: 4px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.avatar-bot { background: #4a154b; }
+.avatar-person { background: #1264a3; color: white; font-size: 14px; font-weight: 700; }
+
+.msg-content { flex: 1; }
+.msg-header { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.msg-author { font-weight: 700; font-size: 15px; color: #e8e8e8; }
+.msg-badge { font-size: 11px; background: #35373b; color: #8b8d90; padding: 1px 4px; border-radius: 3px; vertical-align: middle; }
+.msg-time { font-size: 12px; color: #8b8d90; }
+.msg-text { font-size: 15px; line-height: 1.5; color: #d1d2d3; }
+
+.attachment { margin-top: 8px; border-left: 4px solid #e01e5a; background: #2b2d31; border-radius: 0 4px 4px 0; padding: 12px 16px; }
+.attachment-success { border-left-color: #2eb67d; }
+.attachment-title { font-weight: 700; font-size: 14px; color: #e8e8e8; margin-bottom: 8px; }
+.attachment-field { margin-bottom: 6px; font-size: 14px; }
+.attachment-label { font-weight: 700; color: #d1d2d3; }
+.attachment-value { color: #d1d2d3; }
+.attachment-value.red { color: #e01e5a; }
+.attachment-value.green { color: #2eb67d; }
+.attachment-link { color: #1d9bd1; text-decoration: none; font-size: 13px; }
+.attachment-link:hover { text-decoration: underline; }
+
+.reaction { display: inline-flex; align-items: center; gap: 4px; background: #2b2d31; border: 1px solid #35373b; border-radius: 12px; padding: 2px 8px; font-size: 12px; margin-top: 8px; margin-right: 4px; cursor: pointer; }
+.reaction:hover { border-color: #1d9bd1; }
+.reaction-count { color: #1d9bd1; }
+
+.thread-reply { margin-top: 6px; font-size: 13px; color: #1d9bd1; cursor: pointer; }
+.thread-reply:hover { text-decoration: underline; }
+
+.divider { display: flex; align-items: center; gap: 12px; padding: 16px 20px; }
+.divider-line { flex: 1; height: 1px; background: #35373b; }
+.divider-text { font-size: 12px; font-weight: 700; color: #8b8d90; }
+</style>
+</head>
+<body>
+<div class="slack-container">
+
+<div class="channel-header">
+  <div class="channel-name">ai-alerts</div>
+</div>
+
+<div class="divider">
+  <div class="divider-line"></div>
+  <div class="divider-text">Thursday, July 3rd</div>
+  <div class="divider-line"></div>
+</div>
+
+<div class="message">
+  <div class="avatar avatar-bot">&#x1F916;</div>
+  <div class="msg-content">
+    <div class="msg-header">
+      <span class="msg-author">Eval Bot</span>
+      <span class="msg-badge">APP</span>
+      <span class="msg-time">6:07 AM</span>
+    </div>
+    <div class="msg-text">&#x26A0;&#xFE0F; <strong>Nightly eval regression detected</strong></div>
+    <div class="attachment">
+      <div class="attachment-title">Production Eval Results — support-bot</div>
+      <div class="attachment-field">
+        <span class="attachment-label">Pass Rate:</span>
+        <span class="attachment-value red">62.5% (5/8)</span> — was 100%
+      </div>
+      <div class="attachment-field">
+        <span class="attachment-label">Avg Latency:</span>
+        <span class="attachment-value red">8,420ms</span> — was 4,230ms (+99%)
+      </div>
+      <div class="attachment-field">
+        <span class="attachment-label">Failing Cases:</span>
+        <span class="attachment-value">icloud-cancel-photos, warranty-multi-part, trade-in-complex</span>
+      </div>
+      <div class="attachment-field">
+        <span class="attachment-label">Likely Cause:</span>
+        <span class="attachment-value">No code changes since last passing run — possible model provider update</span>
+      </div>
+      <div class="attachment-field">
+        <a class="attachment-link" href="#">View full report &#x2192; github.com/sarthakrastogi/production-ai-app/actions/runs/94821</a>
+      </div>
+    </div>
+    <div class="reaction">&#x1F440; <span class="reaction-count">3</span></div>
+    <div class="reaction">&#x1F6A8; <span class="reaction-count">2</span></div>
+    <div class="thread-reply">4 replies</div>
+  </div>
+</div>
+
+<div class="message" style="padding-left: 68px; margin-top: 4px;">
+  <div class="avatar avatar-person">SR</div>
+  <div class="msg-content">
+    <div class="msg-header">
+      <span class="msg-author">Sarthak Rastogi</span>
+      <span class="msg-time">6:32 AM</span>
+    </div>
+    <div class="msg-text">checked the traces — gemini flash is ignoring retrieved context on the complex queries. hallucinating policy details instead. no code change, looks like a model update on google's end. going to pin to last week's version and add a more constraining system prompt as backup.</div>
+  </div>
+</div>
+
+<div class="divider">
+  <div class="divider-line"></div>
+  <div class="divider-text">Today</div>
+  <div class="divider-line"></div>
+</div>
+
+<div class="message">
+  <div class="avatar avatar-bot">&#x1F916;</div>
+  <div class="msg-content">
+    <div class="msg-header">
+      <span class="msg-author">Eval Bot</span>
+      <span class="msg-badge">APP</span>
+      <span class="msg-time">6:04 AM</span>
+    </div>
+    <div class="msg-text">&#x2705; <strong>Nightly evals passed</strong></div>
+    <div class="attachment attachment-success">
+      <div class="attachment-title">Production Eval Results — support-bot</div>
+      <div class="attachment-field">
+        <span class="attachment-label">Pass Rate:</span>
+        <span class="attachment-value green">100% (8/8)</span>
+      </div>
+      <div class="attachment-field">
+        <span class="attachment-label">Avg Latency:</span>
+        <span class="attachment-value green">3,980ms</span>
+      </div>
+      <div class="attachment-field">
+        <span class="attachment-label">Est. Cost:</span>
+        <span class="attachment-value">$0.0029</span>
+      </div>
+      <div class="attachment-field">
+        <a class="attachment-link" href="#">View full report &#x2192;</a>
+      </div>
+    </div>
+    <div class="reaction">&#x1F389; <span class="reaction-count">2</span></div>
+  </div>
+</div>
+
+</div>
+</body>
+</html>
