@@ -1,0 +1,103 @@
+name: Nightly Eval Regression Check
+
+on:
+  schedule:
+    - cron: "0 6 * * *"  # 6am UTC daily
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  nightly-eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install httpx python-jose[cryptography] pydantic-settings
+
+      - name: Run eval suite against production
+        env:
+          EVAL_APP_URL: ${{ secrets.PRODUCTION_URL }}
+          EVAL_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: python -m evals.run_evals
+        continue-on-error: true
+
+      - name: Run trace verification
+        env:
+          EVAL_APP_URL: ${{ secrets.PRODUCTION_URL }}
+          EVAL_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          LANGCHAIN_API_KEY: ${{ secrets.LANGCHAIN_API_KEY }}
+        run: python -m evals.eval_traces
+        continue-on-error: true
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-eval-${{ github.run_number }}
+          path: evals/reports/
+
+      - name: Check for regressions and alert
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          python -c "
+          import json, sys, os
+
+          report_path = 'evals/reports/latest.json'
+          try:
+              report = json.loads(open(report_path).read())
+          except FileNotFoundError:
+              print('No report generated - eval run likely failed entirely')
+              sys.exit(1)
+
+          summary = report['summary']
+          comparison = report.get('baseline_comparison', {})
+
+          print(f'Pass rate: {summary[\"pass_rate\"]:.0%}')
+          print(f'Avg latency: {summary[\"avg_latency_ms\"]:.0f}ms')
+          print(f'P95 latency: {summary[\"p95_latency_ms\"]:.0f}ms')
+          print(f'Cost: \${summary[\"total_estimated_cost_usd\"]:.4f}')
+
+          has_issues = False
+
+          if summary['pass_rate'] < 0.8:
+              print(f'ALERT: Pass rate dropped to {summary[\"pass_rate\"]:.0%}')
+              has_issues = True
+
+          if comparison.get('has_regressions'):
+              print('ALERT: Regressions detected:')
+              for r in comparison['regressions']:
+                  print(f'  - {r[\"metric\"]}')
+              has_issues = True
+
+          if has_issues:
+              # Post to Slack if webhook is configured
+              webhook = os.environ.get('SLACK_WEBHOOK')
+              if webhook:
+                  import urllib.request
+                  msg = {
+                      'text': f':warning: Nightly eval regression detected\\n'
+                              f'Pass rate: {summary[\"pass_rate\"]:.0%}\\n'
+                              f'Avg latency: {summary[\"avg_latency_ms\"]:.0f}ms\\n'
+                              f'See: {os.environ.get(\"GITHUB_SERVER_URL\", \"\")}/{os.environ.get(\"GITHUB_REPOSITORY\", \"\")}/actions/runs/{os.environ.get(\"GITHUB_RUN_ID\", \"\")}'
+                  }
+                  req = urllib.request.Request(
+                      webhook,
+                      data=json.dumps(msg).encode(),
+                      headers={'Content-Type': 'application/json'}
+                  )
+                  urllib.request.urlopen(req)
+              sys.exit(1)
+
+          print('All clear - no regressions detected')
+          "

@@ -1,0 +1,9 @@
+region = "us-east-1"
+
+db_password     = "change-me"
+mongodb_uri     = "mongodb+srv://user:pass@cluster.mongodb.net/support_bot"
+certificate_arn = "arn:aws:acm:us-east-1:123456789:certificate/abc-123"
+
+# Optional
+# gptcache_url         = "http://gptcache-service:8001"
+# alarm_sns_topic_arns = ["arn:aws:sns:us-east-1:123456789:support-bot-alerts"]

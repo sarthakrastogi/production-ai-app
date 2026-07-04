@@ -23,8 +23,8 @@ class Settings(BaseSettings):
     COMPLETENESS_THRESHOLD: float = 0.6
 
     # Model selection
-    LOW_COMPLEXITY_MODEL: str = "gemini-2.0-flash"
-    HIGH_COMPLEXITY_MODEL: str = "gemini-2.5-pro"  # swap to "gpt-4o" if preferred
+    LOW_COMPLEXITY_MODEL: str = "gemini-3.5-flash"
+    HIGH_COMPLEXITY_MODEL: str = "gemini-3.1-pro"  # swap to "gpt-4o" if preferred
 
     class Config:
         env_file = ".env"

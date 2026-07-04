@@ -1,0 +1,148 @@
+name: Eval Gate — Live Evals & Regression Check
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      update_baseline:
+        description: "Update baseline with current results"
+        type: boolean
+        default: false
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  live-evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: support_bot
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-asyncio python-jose[cryptography]
+
+      - name: Start app in background
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          LANGCHAIN_API_KEY: ${{ secrets.LANGCHAIN_API_KEY }}
+          LANGCHAIN_TRACING_V2: "true"
+          PAGEINDEX_API_KEY: ${{ secrets.PAGEINDEX_API_KEY }}
+          JWT_SECRET: eval-ci-secret
+          GPTCACHE_URL: "http://localhost:8001"
+          RIVAL_URL: "http://localhost:8002"
+          MONGODB_URI: "mongodb://localhost:27017"
+          POSTGRES_DSN: "postgresql://postgres:postgres@localhost:5432/support_bot"
+        run: |
+          uvicorn app.main:app --host 0.0.0.0 --port 8000 &
+          echo "Waiting for app to start..."
+          for i in $(seq 1 30); do
+            curl -s http://localhost:8000/health && break
+            sleep 2
+          done
+
+      - name: Run live eval suite
+        env:
+          EVAL_APP_URL: "http://localhost:8000"
+          EVAL_JWT_SECRET: eval-ci-secret
+        run: python -m evals.run_evals
+
+      - name: Upload eval report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-eval-report
+          path: evals/reports/latest.json
+
+      - name: Comment eval results on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = JSON.parse(fs.readFileSync('evals/reports/latest.json', 'utf8'));
+            const s = report.summary;
+            const comparison = report.baseline_comparison || {};
+
+            let body = `## Eval Results\n\n`;
+            body += `| Metric | Value |\n|--------|-------|\n`;
+            body += `| Pass Rate | ${(s.pass_rate * 100).toFixed(1)}% (${s.passed}/${s.total}) |\n`;
+            body += `| Avg Latency | ${s.avg_latency_ms.toFixed(0)}ms |\n`;
+            body += `| P95 Latency | ${s.p95_latency_ms.toFixed(0)}ms |\n`;
+            body += `| Est. Cost | $${s.total_estimated_cost_usd.toFixed(4)} |\n\n`;
+
+            if (comparison.has_regressions) {
+              body += `### Regressions Detected\n\n`;
+              for (const reg of comparison.regressions) {
+                body += `- **${reg.metric}**: ${reg.detail || `${reg.change_pct}% change (threshold: ${reg.threshold_pct}%)`}\n`;
+              }
+            } else if (comparison.baseline_available) {
+              body += `No regressions vs baseline.\n`;
+            } else {
+              body += `_No baseline available for comparison._\n`;
+            }
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body,
+            });
+
+      - name: Update baseline (if requested)
+        if: github.event.inputs.update_baseline == 'true'
+        run: |
+          mkdir -p evals/baselines
+          cp evals/reports/latest.json evals/baselines/latest.json
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add evals/baselines/latest.json
+          git commit -m "chore: update eval baseline" || true
+          git push
+
+      - name: Gate check — fail on regressions
+        run: |
+          python -c "
+          import json, sys
+          report = json.loads(open('evals/reports/latest.json').read())
+          comparison = report.get('baseline_comparison', {})
+          if comparison.get('has_regressions'):
+              print('BLOCKED: Eval regressions detected')
+              for r in comparison['regressions']:
+                  print(f'  - {r[\"metric\"]}: {r.get(\"detail\", str(r.get(\"change_pct\", \"\")) + \"% change\")}')
+              sys.exit(1)
+          if report['summary']['pass_rate'] < 0.8:
+              print(f'BLOCKED: Pass rate {report[\"summary\"][\"pass_rate\"]:.0%} < 80%')
+              sys.exit(1)
+          print('PASSED: All eval gates clear')
+          "

@@ -1,0 +1,96 @@
+[
+  {
+    "id": "airpods-reset",
+    "query": "How do I reset my AirPods?",
+    "expected_intent": "device_troubleshooting",
+    "expected_topics": ["airpods", "reset", "troubleshooting"],
+    "expected_complexity": "low",
+    "expected_model": "flash",
+    "reference_answer": "To reset your AirPods, put them in the charging case, close the lid, wait 30 seconds, then open the lid. On your iPhone, go to Settings > Bluetooth, tap the info icon next to your AirPods, and tap Forget This Device. Then, with the lid open, press and hold the setup button on the back of the case for about 15 seconds until the status light flashes amber then white.",
+    "max_latency_ms": 8000,
+    "max_tokens": 500
+  },
+  {
+    "id": "icloud-cancel-photos",
+    "query": "How do I cancel my iCloud subscription, and will I lose my photos?",
+    "expected_intent": "account_management",
+    "expected_topics": ["icloud", "subscription", "photos", "cancellation"],
+    "expected_complexity": "high",
+    "expected_model": "pro",
+    "needs_decomp": true,
+    "sub_query_count": 2,
+    "reference_answer": "To cancel iCloud+, go to Settings > [your name] > Subscriptions > iCloud+ and tap Cancel. After cancellation, your storage drops to 5GB free. Photos stored in iCloud will remain for 30 days, but if your total storage exceeds 5GB after that period, new photos won't upload and eventually older photos may be removed from iCloud (though they stay on the device that took them).",
+    "max_latency_ms": 15000,
+    "max_tokens": 800
+  },
+  {
+    "id": "iphone-wont-turn-on",
+    "query": "My iPhone won't turn on at all, what should I do?",
+    "expected_intent": "device_troubleshooting",
+    "expected_topics": ["iphone", "power", "troubleshooting"],
+    "expected_complexity": "low",
+    "expected_model": "flash",
+    "reference_answer": "Try these steps: 1) Charge your iPhone for at least 30 minutes with a known-good cable and charger. 2) Force restart: quickly press and release Volume Up, quickly press and release Volume Down, then press and hold the Side button until you see the Apple logo. 3) If nothing works, connect to a computer with iTunes/Finder and try recovery mode. If none of these work, contact Apple Support or visit an Apple Store for hardware diagnosis.",
+    "max_latency_ms": 8000,
+    "max_tokens": 600
+  },
+  {
+    "id": "apple-id-locked",
+    "query": "My Apple ID is locked and I can't remember my password or security questions. I also don't have access to my trusted phone number anymore.",
+    "expected_intent": "account_recovery",
+    "expected_topics": ["apple_id", "locked", "recovery", "password"],
+    "expected_complexity": "high",
+    "expected_model": "pro",
+    "reference_answer": "When you've lost access to your password, security questions, and trusted phone number, you'll need to use Apple's Account Recovery process at iforgot.apple.com. This initiates a waiting period (can be several days) during which Apple verifies your identity. You may be asked to provide proof of purchase or other identity verification.",
+    "max_latency_ms": 12000,
+    "max_tokens": 700
+  },
+  {
+    "id": "multi-device-sync",
+    "query": "How do I sync my Apple Watch with my new iPhone, and will I lose my workout history? Also, do I need to unpair from my old phone first?",
+    "expected_intent": "device_setup",
+    "expected_topics": ["apple_watch", "sync", "iphone", "workout_history", "pairing"],
+    "expected_complexity": "high",
+    "expected_model": "pro",
+    "needs_decomp": true,
+    "sub_query_count": 3,
+    "reference_answer": "Yes, you need to unpair your Apple Watch from your old iPhone first — this automatically creates a backup. Then pair it with your new iPhone and restore from that backup. Your workout history is preserved in the backup and also syncs via iCloud if Health is enabled in your iCloud settings.",
+    "max_latency_ms": 18000,
+    "max_tokens": 900
+  },
+  {
+    "id": "warranty-check",
+    "query": "Is water damage covered under AppleCare+?",
+    "expected_intent": "warranty_inquiry",
+    "expected_topics": ["applecare", "warranty", "water_damage"],
+    "expected_complexity": "low",
+    "expected_model": "flash",
+    "reference_answer": "AppleCare+ covers accidental damage including liquid damage, subject to a service fee (deductible). For iPhones, the fee is typically $99 for screen/back glass damage and $149 for other accidental damage including water damage. Standard Apple warranty (without AppleCare+) does NOT cover liquid damage.",
+    "max_latency_ms": 8000,
+    "max_tokens": 500
+  },
+  {
+    "id": "family-sharing-limits",
+    "query": "Can I set screen time limits for my kid through Family Sharing, and can they override them?",
+    "expected_intent": "parental_controls",
+    "expected_topics": ["family_sharing", "screen_time", "parental_controls"],
+    "expected_complexity": "high",
+    "expected_model": "pro",
+    "needs_decomp": true,
+    "sub_query_count": 2,
+    "reference_answer": "Yes, through Family Sharing you can set Screen Time limits for any child account. Go to Settings > Screen Time > your child's name. You can set downtime, app limits, and content restrictions. Children cannot override these limits without the Screen Time passcode — they can only request more time, which sends you a notification to approve or deny.",
+    "max_latency_ms": 15000,
+    "max_tokens": 700
+  },
+  {
+    "id": "airplay-not-working",
+    "query": "AirPlay isn't showing my TV as an option",
+    "expected_intent": "connectivity_troubleshooting",
+    "expected_topics": ["airplay", "tv", "connectivity"],
+    "expected_complexity": "low",
+    "expected_model": "flash",
+    "reference_answer": "Make sure both devices are on the same Wi-Fi network. Restart your Apple TV or AirPlay-compatible TV. On your iPhone/iPad, open Control Center and tap Screen Mirroring to check. If the TV still doesn't appear, restart your router, and check that AirPlay is enabled on the TV (Settings > AirPlay and HomeKit on Apple TV).",
+    "max_latency_ms": 8000,
+    "max_tokens": 500
+  }
+]

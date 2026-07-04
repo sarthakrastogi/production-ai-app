@@ -1,0 +1,112 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  # Gate: only deploy if CI passes
+  ci-check:
+    uses: ./.github/workflows/ci.yml
+
+  build-and-push:
+    needs: ci-check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push app image
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+        run: |
+          docker build -t $ECR_REGISTRY/support-bot-app:${{ github.sha }} .
+          docker tag $ECR_REGISTRY/support-bot-app:${{ github.sha }} $ECR_REGISTRY/support-bot-app:latest
+          docker push $ECR_REGISTRY/support-bot-app:${{ github.sha }}
+          docker push $ECR_REGISTRY/support-bot-app:latest
+
+      - name: Build and push rival-service image
+        env:
+          ECR_REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+        run: |
+          docker build -t $ECR_REGISTRY/support-bot-rival:${{ github.sha }} ./services/rival_service
+          docker tag $ECR_REGISTRY/support-bot-rival:${{ github.sha }} $ECR_REGISTRY/support-bot-rival:latest
+          docker push $ECR_REGISTRY/support-bot-rival:${{ github.sha }}
+          docker push $ECR_REGISTRY/support-bot-rival:latest
+
+  deploy-infra:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+
+      - name: Terraform Init
+        working-directory: terraform
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: terraform
+        run: terraform plan -var="app_image_tag=${{ github.sha }}" -var="rival_image_tag=${{ github.sha }}" -out=tfplan
+
+      - name: Terraform Apply
+        working-directory: terraform
+        run: terraform apply -auto-approve tfplan
+
+  post-deploy-evals:
+    needs: deploy-infra
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install eval dependencies
+        run: pip install httpx python-jose[cryptography] pydantic-settings
+
+      - name: Run post-deploy smoke test
+        env:
+          EVAL_APP_URL: ${{ secrets.PRODUCTION_URL }}
+          EVAL_JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        run: python -m evals.run_evals
+
+      - name: Upload post-deploy report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-deploy-eval-report
+          path: evals/reports/latest.json
